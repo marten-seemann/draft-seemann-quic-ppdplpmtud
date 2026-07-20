@@ -6,7 +6,7 @@ category: info
 docname: draft-seemann-quic-ppdplpmtud-latest
 
 ipr: trust200902
-area: "Transport"
+area: "Web and Internet Transport"
 workgroup: "QUIC"
 keyword: Internet-Draft
 venue:
@@ -14,8 +14,8 @@ venue:
   type: "Working Group"
   mail: "quic@ietf.org"
   arch: "https://mailarchive.ietf.org/arch/browse/quic/"
-  github: "quicwg/parallel-probing-dplpmtud"
-  latest: "https://quicwg.github.io/parallel-probing-dplpmtud/draft-ietf-quic-parallel-probing-dplpmtud.html"
+  github: "marten-seemann/draft-seemann-quic-ppdplpmtud"
+  latest: "https://marten-seemann.github.io/draft-seemann-quic-ppdplpmtud/draft-seemann-quic-ppdplpmtud.html"
 
 stand_alone: yes
 smart_quotes: no
