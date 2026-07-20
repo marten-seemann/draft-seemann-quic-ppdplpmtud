@@ -28,8 +28,19 @@ author:
     email: martenseemann@gmail.com
 
 normative:
+  RFC2119:
+  RFC8174:
+  RFC8899:
+  RFC9000:
+  RFC9001:
+  RFC9002:
 
 informative:
+  RFC9221:
+  RFC9298:
+  RFC9484:
+  I-D.ietf-masque-connect-ethernet:
+  I-D.ietf-webtrans-http3:
 
 ...
 
@@ -48,16 +59,16 @@ available when the handshake completes.
 # Introduction
 
 QUIC endpoints commonly limit datagrams to 1200 bytes until Datagram
-Packetization Layer Path MTU Discovery (DPLPMTUD) {{!RFC8899}} confirms a larger
-size. Sequential probing after the handshake {{!RFC9000}} can take several round
+Packetization Layer Path MTU Discovery (DPLPMTUD) {{RFC8899}} confirms a larger
+size. Sequential probing after the handshake {{RFC9000}} can take several round
 trips.
 
-The delay is particularly undesirable for CONNECT-UDP {{!RFC9298}}, CONNECT-IP
-{{!RFC9484}}, and CONNECT-ETHERNET {{?I-D.ietf-masque-connect-ethernet}}.
+The delay is particularly undesirable for CONNECT-UDP {{RFC9298}}, CONNECT-IP
+{{RFC9484}}, and CONNECT-ETHERNET {{I-D.ietf-masque-connect-ethernet}}.
 Encapsulation can make 1200-byte QUIC datagrams insufficient, while discovering
 an outer tunnel's MTU can delay Path MTU Discovery by an inner transport.
-WebTransport over HTTP/3 {{?I-D.ietf-webtrans-http3}} benefits similarly when
-using QUIC DATAGRAM frames {{!RFC9221}}.
+WebTransport over HTTP/3 {{I-D.ietf-webtrans-http3}} benefits similarly when
+using QUIC DATAGRAM frames {{RFC9221}}.
 
 PPDPLPMTUD sends probes of several sizes during the handshake without waiting
 for individual results. It needs no new frames or transport parameters and
@@ -69,8 +80,8 @@ only when the application is expected to benefit early in the connection.
 
 {::boilerplate bcp14-tagged}
 
-This document uses the terminology of {{!RFC8899}}, {{!RFC9000}}, and
-{{!RFC9002}}. Datagram size means UDP payload size.
+This document uses the terminology of {{RFC8899}}, {{RFC9000}}, and
+{{RFC9002}}. Datagram size means UDP payload size.
 
 
 # Parallel Probing
@@ -94,13 +105,13 @@ detection.
 
 All packets, including probes, consume congestion window and MUST fit within the
 available congestion window. PPDPLPMTUD MAY send the complete flight as a burst
-subject to Section 7.7 of {{!RFC9002}}. An endpoint SHOULD send the sequence
+subject to Section 7.7 of {{RFC9002}}. An endpoint SHOULD send the sequence
 over substantially less than the initial RTT, or send fewer probes, to avoid
 leaving probes unsent when packet protection keys are discarded.
 
 PPDPLPMTUD does not change congestion control. Increasing the maximum datagram
 size MUST NOT increase the congestion window measured in bytes. As specified by
-{{!RFC8899}} and {{!RFC9000}}, isolated loss of a PMTU probe SHOULD NOT cause a
+{{RFC8899}} and {{RFC9000}}, isolated loss of a PMTU probe SHOULD NOT cause a
 congestion-control reaction. An endpoint SHOULD send at most one parallel
 sequence in each direction during connection establishment.
 
@@ -118,7 +129,7 @@ handshake.
 ## Coalesced Probes
 
 A probe MAY be a coalesced datagram containing packets from multiple packet
-number spaces, as described in Section 12.2 of {{!RFC9000}}. A client can
+number spaces, as described in Section 12.2 of {{RFC9000}}. A client can
 coalesce Initial and 0-RTT packets; a server can coalesce Initial and Handshake
 packets, optionally followed by a 1-RTT packet. An acknowledgment of any
 constituent packet confirms the datagram size. This can preserve the result when
@@ -151,7 +162,7 @@ handshake flight first, then probes within the remaining congestion window. If
 probes carry redundant CRYPTO data, copies of each range SHOULD span different
 probe sizes. When 1-RTT keys are available, new PING frames use 1-RTT; Initial
 and Handshake packets can carry retransmitted CRYPTO data, acknowledgments, and
-padding as permitted by {{!RFC9001}}.
+padding as permitted by {{RFC9001}}.
 
 
 ## Address Validation
@@ -171,8 +182,8 @@ replace confirmation on the current path.
 
 # Security Considerations
 
-The security considerations of {{!RFC8899}}, {{!RFC9000}}, {{!RFC9001}}, and
-{{!RFC9002}} apply.
+The security considerations of {{RFC8899}}, {{RFC9000}}, {{RFC9001}}, and
+{{RFC9002}} apply.
 
 PPDPLPMTUD adds traffic and processing during connection establishment and can
 cause a short burst of queueing or loss. Implementations SHOULD use only as many
