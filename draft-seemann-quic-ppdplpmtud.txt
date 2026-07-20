@@ -263,20 +263,6 @@ Table of Contents
               and Congestion Control", RFC 9002, DOI 10.17487/RFC9002,
               May 2021, <https://www.rfc-editor.org/rfc/rfc9002>.
 
-   [RFC9221]  Pauly, T., Kinnear, E., and D. Schinazi, "An Unreliable
-              Datagram Extension to QUIC", RFC 9221,
-              DOI 10.17487/RFC9221, March 2022,
-              <https://www.rfc-editor.org/rfc/rfc9221>.
-
-   [RFC9298]  Schinazi, D., "Proxying UDP in HTTP", RFC 9298,
-              DOI 10.17487/RFC9298, August 2022,
-              <https://www.rfc-editor.org/rfc/rfc9298>.
-
-   [RFC9484]  Pauly, T., Ed., Schinazi, D., Chernyakhovsky, A.,
-              Kühlewind, M., and M. Westerlund, "Proxying IP in HTTP",
-              RFC 9484, DOI 10.17487/RFC9484, October 2023,
-              <https://www.rfc-editor.org/rfc/rfc9484>.
-
 8.2.  Informative References
 
    [I-D.ietf-masque-connect-ethernet]
@@ -292,6 +278,20 @@ Table of Contents
               ietf-webtrans-http3-16, 6 July 2026,
               <https://datatracker.ietf.org/doc/html/draft-ietf-
               webtrans-http3-16>.
+
+   [RFC9221]  Pauly, T., Kinnear, E., and D. Schinazi, "An Unreliable
+              Datagram Extension to QUIC", RFC 9221,
+              DOI 10.17487/RFC9221, March 2022,
+              <https://www.rfc-editor.org/rfc/rfc9221>.
+
+   [RFC9298]  Schinazi, D., "Proxying UDP in HTTP", RFC 9298,
+              DOI 10.17487/RFC9298, August 2022,
+              <https://www.rfc-editor.org/rfc/rfc9298>.
+
+   [RFC9484]  Pauly, T., Ed., Schinazi, D., Chernyakhovsky, A.,
+              Kühlewind, M., and M. Westerlund, "Proxying IP in HTTP",
+              RFC 9484, DOI 10.17487/RFC9484, October 2023,
+              <https://www.rfc-editor.org/rfc/rfc9484>.
 
 Author's Address
 
