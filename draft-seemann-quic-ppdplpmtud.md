@@ -51,7 +51,7 @@ informative:
 --- abstract
 
 QUIC endpoints commonly use 1200-byte datagrams during the handshake and only
-start path MTU discovery afterward. This means that just-established QUIC
+start Path MTU Discovery afterward. This means that just-established QUIC
 connections cannot immediately use larger datagrams, which is especially limiting
 for MASQUE protocols and for WebTransport.
 This document defines Parallel Probing DPLPMTUD (PPDPLPMTUD), which probes
