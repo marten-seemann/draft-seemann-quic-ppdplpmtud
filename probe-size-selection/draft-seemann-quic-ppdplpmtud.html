@@ -1287,7 +1287,7 @@ encouraged to use information about common PMTUs and application requirements.
 Equally spaced probe sizes provide a simple alternative.<a href="#section-3.2-1" class="pilcrow">¶</a></p>
 <p id="section-3.2-2">For example, a client that sends its ClientHello in two 1200-byte datagrams has
 9600 bytes remaining in the 12000-byte initial congestion window defined by
-Section 7.2 of <span>[<a href="#RFC9002" class="cite xref">RFC9002</a>]</span>.  With an upper probe size of 1472 bytes, it can send
+<span><a href="https://rfc-editor.org/rfc/rfc9002#section-7.2" class="relref">Section 7.2</a> of [<a href="#RFC9002" class="cite xref">RFC9002</a>]</span>.  With an upper probe size of 1472 bytes, it can send
 seven probes of 1472, 1433, 1394, 1355, 1317, 1278, and 1239 bytes.  The probes
 consume 9488 bytes and the complete flight consumes 11888 bytes.  Together
 with the current maximum of 1200 bytes, these sizes provide confirmation points
