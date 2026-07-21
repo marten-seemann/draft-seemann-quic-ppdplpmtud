@@ -29,10 +29,6 @@ author:
  -
     name: Lars Eggert
     org: Mozilla
-    street: Stenbergintie 12 B
-    city: Kauniainen
-    code: "02700"
-    country: FI
     email: lars@eggert.org
     uri: https://eggert.org/
 
