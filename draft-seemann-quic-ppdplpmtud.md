@@ -115,8 +115,7 @@ leaving probes unsent when packet protection keys are discarded.
 PPDPLPMTUD does not change congestion control. Increasing the maximum datagram
 size MUST NOT increase the congestion window measured in bytes. As specified by
 {{RFC8899}} and {{RFC9000}}, isolated loss of a PMTU probe SHOULD NOT cause a
-congestion-control reaction. An endpoint SHOULD send at most one parallel
-sequence in each direction during connection establishment.
+congestion-control reaction.
 
 
 ## Confirmation
