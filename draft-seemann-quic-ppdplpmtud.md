@@ -26,6 +26,11 @@ author:
     ins: M. Seemann
     name: Marten Seemann
     email: martenseemann@gmail.com
+ -
+    name: Lars Eggert
+    org: Mozilla
+    email: lars@eggert.org
+    uri: https://eggert.org/
 
 normative:
   RFC2119:
