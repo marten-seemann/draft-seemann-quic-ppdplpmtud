@@ -33,6 +33,7 @@ author:
     uri: https://eggert.org/
 
 normative:
+  RFC8174:
   RFC8899:
   RFC9000:
   RFC9001:
@@ -49,12 +50,15 @@ informative:
 
 --- abstract
 
-QUIC endpoints commonly use 1200-byte datagrams until discovering a larger path
-limit after the handshake. This delays larger datagrams for MASQUE protocols
-such as CONNECT-UDP, CONNECT-IP, and CONNECT-ETHERNET, and for WebTransport.
+QUIC endpoints commonly use 1200-byte datagrams during the handshake and only
+start Path MTU Discovery afterward. This means that just-established QUIC
+connections cannot immediately use larger datagrams, which is especially limiting
+for MASQUE protocols and for WebTransport.
 This document defines Parallel Probing DPLPMTUD (PPDPLPMTUD), which probes
-several sizes during the QUIC handshake so the largest confirmed size is
-available when the handshake completes.
+several packet sizes early during the QUIC handshake, so a larger discovered size is
+usable during later handshake phases and especially after handshake completion.
+The same discovery process is also used for path migration.
+
 
 
 --- middle
@@ -73,34 +77,62 @@ an outer tunnel's MTU can delay Path MTU Discovery by an inner transport.
 WebTransport over HTTP/3 {{I-D.ietf-webtrans-http3}} benefits similarly when
 using QUIC DATAGRAM frames {{RFC9221}}.
 
-PPDPLPMTUD sends probes of several sizes during the handshake without waiting
-for individual results. It needs no new frames or transport parameters and
+PPDPLPMTUD sends parallel probes for several distinct packet sizes
+without waiting for individual results. It needs no new frames or transport parameters and
 operates independently in each direction. The additional traffic is justified
 only when the application is expected to benefit early in the connection.
-
 
 # Conventions and Definitions
 
 {::boilerplate bcp14-tagged}
 
 This document uses the terminology of {{RFC8899}}, {{RFC9000}}, and
-{{RFC9002}}. Datagram size means UDP payload size.
+{{RFC9002}}.
 
+# Parallel Probing DPLPMTUD (PPDPLPMTUD)
 
-# Parallel Probing
+PPDPLPMTUD is a QUIC-specific mechanism. It does **not** probe for the MTU, i.e., it does **not** determine the **maximum** transmission unit that can be used on a path. Instead, it attempts to detect a safe larger-than-minimum packet size for a given **Internet** path.
+
+Restricting PPDPLPMTUD to Internet paths means that the maximum packet size probed for is the minimum of the common 1500-byte Ethernet MTU and the local interface MTU on the path towards the destination. Detection of larger packet sizes is explicitly out of scope.
+
+## Probe Size Selection
+
+Probe size selection is implementation-specific. Implementations are
+encouraged to use information about common PMTUs and application requirements.
+Equally-spaced probe sizes provide a simple alternative.
+
+For example, a client that sends its ClientHello in two 1200-byte datagrams has
+9600 bytes remaining in the 12000-byte initial congestion window defined by
+Section 7.2 of {{RFC9002}}.  With an upper probe size of 1472 bytes, it can send
+seven probes of 1472, 1433, 1394, 1355, 1317, 1278, and 1239 bytes.  The probes
+consume 9488 bytes and the complete flight consumes 11888 bytes.  Together
+with the current maximum of 1200 bytes, these sizes provide confirmation points
+approximately 39 bytes apart.
 
 ## Probe Construction
 
-An endpoint selects several datagram sizes above its current maximum and sends
-an ack-eliciting probe with a new packet number for each. A probe can contain a
+An endpoint selects several packet sizes above its current maximum and sends
+an ACK-eliciting probe with a new packet number for each.
+
+During the handshake, a probe can contain a
 PING frame and enough PADDING frames to reach the selected size. It MAY instead
 carry copies of CRYPTO data from the regular handshake flight. The handshake
 MUST complete without receiving any probe above the current maximum.
 
+When probing during path migration, a probe can only contain PADDING, NEW_CONNECTION_ID, PATH_CHALLENGE and PATH_RESPONSE frames, per {{Section 12.4 of RFC9000}}.
+
+
+## Maximize Congestion Window Utilization
+
+The key idea of PPDPLPMTUD is to maximize use of the available congestion window (cwnd) for sending parallel probes.
+
+During the handshake, the initial cwnd of 12,000 bytes applies over Internet paths {{Section 7.2 of RFC9002}}. QUIC uses part of that cwnd to encode the initial client and server flights into QUIC packets. PPDPLPMTUD then uses the remaining cwnd to encode a number of packet size probes. These packets are then transmitted largest-size first.
+
+When an endpoint receives an ACK for this initial flight, it determines the largest packet size successfully received by the peer, which becomes the maximum datagram size for the endpoint {{Section 14 of RFC9000}}.
 
 ## Order and Timing
 
-The endpoint sends regular handshake packets at its current maximum before the
+The endpoint sends regular handshake packets at its current maximum packet size before any packet size
 probes. Within each packet number space, it SHOULD send probes from largest to
 smallest. Smaller probes then have larger packet numbers, allowing their
 acknowledgments to expose missing larger probes to packet-threshold loss
@@ -108,22 +140,22 @@ detection.
 
 All packets, including probes, consume congestion window and MUST fit within the
 available congestion window. PPDPLPMTUD MAY send the complete flight as a burst
-subject to Section 7.7 of {{RFC9002}}. An endpoint SHOULD send the sequence
+subject to {{Section 7.7 of RFC9002}}. An endpoint SHOULD send the sequence
 over substantially less than the initial RTT, or send fewer probes, to avoid
 leaving probes unsent when packet protection keys are discarded.
 
 PPDPLPMTUD does not change congestion control. Increasing the maximum datagram
 size MUST NOT increase the congestion window measured in bytes. As specified by
-{{RFC8899}} and {{RFC9000}}, isolated loss of a PMTU probe SHOULD NOT cause a
-congestion-control reaction.
+{{RFC8899}} and {{RFC9000}}, isolated loss of a packet size probe SHOULD NOT cause a
+congestion control reaction.
 
 
 ## Confirmation
 
-The sender records the datagram size for every probe packet number. An
+The sender records the packet size for every probe packet number. An
 acknowledgment confirms that size and all smaller sizes. A missing
 acknowledgment does not prove that a size is unsupported: PPDPLPMTUD finds a
-confirmed lower bound, not the exact Path MTU. If no probe is acknowledged, the
+confirmed lower bound, not the exact path MTU. If no probe is acknowledged, the
 endpoint retains its previous maximum. Regular DPLPMTUD can continue after the
 handshake.
 
@@ -134,7 +166,7 @@ A probe MAY be a coalesced datagram containing packets from multiple packet
 number spaces, as described in Section 12.2 of {{RFC9000}}. A client can
 coalesce Initial and 0-RTT packets; a server can coalesce Initial and Handshake
 packets, optionally followed by a 1-RTT packet. An acknowledgment of any
-constituent packet confirms the datagram size. This can preserve the result when
+coalesced packet confirms the overall packet size. This can preserve the result when
 another packet number space is discarded and improve handshake progress under
 loss.
 
@@ -172,26 +204,20 @@ padding as permitted by {{RFC9001}}.
 Before address validation, every probe byte counts against the server's
 anti-amplification limit. The server MUST prioritize handshake data and send
 fewer probes or none when its budget is insufficient. Client probes increase
-that budget but reveal nothing about the server-to-client Path MTU.
+that budget but reveal nothing about the packet sizes on the server-to-client path.
 
 
 # Path Changes
 
-A confirmed maximum datagram size applies only to the network path and direction
-on which it was probed. When an endpoint starts using a different network path,
-it MUST NOT use that value without confirmation on the new path. Cached results
-can guide probe sizes but do not replace confirmation on the current path.
+Results are directional and path-specific. Migration, NAT rebinding, or routing
+changes can invalidate them. Cached results can guide probe sizes but do not
+replace confirmation on the current path.
 
-An endpoint MAY perform PPDPLPMTUD while validating a new path. For each
-selected size, it sends a PATH_CHALLENGE frame in a 1-RTT packet and pads the
-UDP datagram to that size. The endpoint associates the packet number with the
-datagram size and uses an acknowledgment of that packet to confirm the size, as
-described in {{confirmation}}.
+# Discussion and Open Issues
 
-These probes remain subject to the path-validation pacing and anti-amplification
-requirements in Section 8.2 of {{RFC9000}} and to the congestion-control
-requirements in {{order-and-timing}}.
+## Limitations during path migration
 
+QUIC endpoints can only include a very limited set of frame types when probing a new path, per {{Section 12.4 of RFC9000}}. It would be worth discussing allowing sending optimistic retransmissions of already-sent STREAM and other frame types in probe packets on new paths.
 
 # Security Considerations
 
