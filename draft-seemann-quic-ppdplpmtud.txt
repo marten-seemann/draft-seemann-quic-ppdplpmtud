@@ -3,9 +3,10 @@
 
 
 QUIC                                                          M. Seemann
-Internet-Draft                                              20 July 2026
-Intended status: Informational                                          
-Expires: 21 January 2027
+Internet-Draft                                                          
+Intended status: Informational                                 L. Eggert
+Expires: 22 January 2027                                         Mozilla
+                                                            21 July 2026
 
 
                    Parallel Probing DPLPMTUD for QUIC
@@ -53,7 +54,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 21 January 2027.
+   This Internet-Draft will expire on 22 January 2027.
 
 Copyright Notice
 
@@ -88,7 +89,7 @@ Table of Contents
    8.  References
      8.1.  Normative References
      8.2.  Informative References
-   Author's Address
+   Authors' Addresses
 
 1.  Introduction
 
@@ -293,7 +294,13 @@ Table of Contents
               RFC 9484, DOI 10.17487/RFC9484, October 2023,
               <https://www.rfc-editor.org/rfc/rfc9484>.
 
-Author's Address
+Authors' Addresses
 
    Marten Seemann
    Email: martenseemann@gmail.com
+
+
+   Lars Eggert
+   Mozilla
+   Email: lars@eggert.org
+   URI:   https://eggert.org/
