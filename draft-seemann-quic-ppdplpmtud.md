@@ -26,6 +26,15 @@ author:
     ins: M. Seemann
     name: Marten Seemann
     email: martenseemann@gmail.com
+ -
+    name: Lars Eggert
+    org: Mozilla
+    street: Stenbergintie 12 B
+    city: Kauniainen
+    code: "02700"
+    country: FI
+    email: lars@eggert.org
+    uri: https://eggert.org/
 
 normative:
   RFC2119:
