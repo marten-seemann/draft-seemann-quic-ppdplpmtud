@@ -80,9 +80,10 @@ Table of Contents
      3.1.  Probe Size Selection
      3.2.  Probe Construction
      3.3.  Maximize Congestion Window Utilization
-     3.4.  Order and Timing
-     3.5.  Confirmation
-     3.6.  Coalesced Probes
+     3.4.  Probe Size Selection
+     3.5.  Order and Timing
+     3.6.  Confirmation
+     3.7.  Coalesced Probes
    4.  Endpoint Behavior
      4.1.  Client
      4.2.  Server
@@ -189,7 +190,23 @@ Table of Contents
    which becomes the maximum datagram size for the endpoint Section 14
    of [RFC9000].
 
-3.4.  Order and Timing
+3.4.  Probe Size Selection
+
+   Probe size selection is implementation-specific.  Implementations are
+   encouraged to use information about common PMTUs and application
+   requirements.  Equally spaced probe sizes provide a simple
+   alternative.
+
+   For example, a client that sends its ClientHello in two 1200-byte
+   datagrams has 9600 bytes remaining in the 12000-byte initial
+   congestion window defined by Section 7.2 of [RFC9002].  With an upper
+   probe size of 1472 bytes, it can send seven probes of 1472, 1433,
+   1394, 1355, 1317, 1278, and 1239 bytes.  The probes consume 9488
+   bytes and the complete flight consumes 11888 bytes.  Together with
+   the current maximum of 1200 bytes, these sizes provide confirmation
+   points approximately 39 bytes apart.
+
+3.5.  Order and Timing
 
    The endpoint sends regular handshake packets at its current maximum
    packet size before any packet size probes.  Within each packet number
@@ -211,7 +228,7 @@ Table of Contents
    loss of a packet size probe SHOULD NOT cause a congestion control
    reaction.
 
-3.5.  Confirmation
+3.6.  Confirmation
 
    The sender records the packet size for every probe packet number.  An
    acknowledgment confirms that size and all smaller sizes.  A missing
@@ -220,7 +237,7 @@ Table of Contents
    is acknowledged, the endpoint retains its previous maximum.  Regular
    DPLPMTUD can continue after the handshake.
 
-3.6.  Coalesced Probes
+3.7.  Coalesced Probes
 
    A probe MAY be a coalesced datagram containing packets from multiple
    packet number spaces, as described in Section 12.2 of [RFC9000].  A

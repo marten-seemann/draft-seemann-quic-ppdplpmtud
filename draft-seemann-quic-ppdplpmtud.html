@@ -1182,13 +1182,16 @@ The same discovery process is also used for path migration.<a href="#section-abs
                 <p id="section-toc.1-1.3.2.3.1"><a href="#section-3.3" class="auto internal xref">3.3</a>.  <a href="#name-maximize-congestion-window-" class="internal xref">Maximize Congestion Window Utilization</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.4">
-                <p id="section-toc.1-1.3.2.4.1"><a href="#section-3.4" class="auto internal xref">3.4</a>.  <a href="#name-order-and-timing" class="internal xref">Order and Timing</a></p>
+                <p id="section-toc.1-1.3.2.4.1"><a href="#section-3.4" class="auto internal xref">3.4</a>.  <a href="#name-probe-size-selection-2" class="internal xref">Probe Size Selection</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.5">
-                <p id="section-toc.1-1.3.2.5.1"><a href="#section-3.5" class="auto internal xref">3.5</a>.  <a href="#name-confirmation" class="internal xref">Confirmation</a></p>
+                <p id="section-toc.1-1.3.2.5.1"><a href="#section-3.5" class="auto internal xref">3.5</a>.  <a href="#name-order-and-timing" class="internal xref">Order and Timing</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.6">
-                <p id="section-toc.1-1.3.2.6.1"><a href="#section-3.6" class="auto internal xref">3.6</a>.  <a href="#name-coalesced-probes" class="internal xref">Coalesced Probes</a></p>
+                <p id="section-toc.1-1.3.2.6.1"><a href="#section-3.6" class="auto internal xref">3.6</a>.  <a href="#name-confirmation" class="internal xref">Confirmation</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.7">
+                <p id="section-toc.1-1.3.2.7.1"><a href="#section-3.7" class="auto internal xref">3.7</a>.  <a href="#name-coalesced-probes" class="internal xref">Coalesced Probes</a></p>
 </li>
             </ul>
 </li>
@@ -1323,52 +1326,69 @@ carry copies of CRYPTO data from the regular handshake flight. The handshake
 <p id="section-3.3-3">When an endpoint receives an ACK for this initial flight, it determines the largest packet size successfully received by the peer, which becomes the maximum datagram size for the endpoint <span><a href="https://rfc-editor.org/rfc/rfc9000#section-14" class="relref">Section 14</a> of [<a href="#RFC9000" class="cite xref">RFC9000</a>]</span>.<a href="#section-3.3-3" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="order-and-timing">
+<div id="probe-size-selection-1">
 <section id="section-3.4">
-        <h3 id="name-order-and-timing">
-<a href="#section-3.4" class="section-number selfRef">3.4. </a><a href="#name-order-and-timing" class="section-name selfRef">Order and Timing</a>
+        <h3 id="name-probe-size-selection-2">
+<a href="#section-3.4" class="section-number selfRef">3.4. </a><a href="#name-probe-size-selection-2" class="section-name selfRef">Probe Size Selection</a>
         </h3>
-<p id="section-3.4-1">The endpoint sends regular handshake packets at its current maximum packet size before any packet size
+<p id="section-3.4-1">Probe size selection is implementation-specific. Implementations are
+encouraged to use information about common PMTUs and application requirements.
+Equally spaced probe sizes provide a simple alternative.<a href="#section-3.4-1" class="pilcrow">¶</a></p>
+<p id="section-3.4-2">For example, a client that sends its ClientHello in two 1200-byte datagrams has
+9600 bytes remaining in the 12000-byte initial congestion window defined by
+<span><a href="https://rfc-editor.org/rfc/rfc9002#section-7.2" class="relref">Section 7.2</a> of [<a href="#RFC9002" class="cite xref">RFC9002</a>]</span>.  With an upper probe size of 1472 bytes, it can send
+seven probes of 1472, 1433, 1394, 1355, 1317, 1278, and 1239 bytes.  The probes
+consume 9488 bytes and the complete flight consumes 11888 bytes.  Together
+with the current maximum of 1200 bytes, these sizes provide confirmation points
+approximately 39 bytes apart.<a href="#section-3.4-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="order-and-timing">
+<section id="section-3.5">
+        <h3 id="name-order-and-timing">
+<a href="#section-3.5" class="section-number selfRef">3.5. </a><a href="#name-order-and-timing" class="section-name selfRef">Order and Timing</a>
+        </h3>
+<p id="section-3.5-1">The endpoint sends regular handshake packets at its current maximum packet size before any packet size
 probes. Within each packet number space, it <span class="bcp14">SHOULD</span> send probes from largest to
 smallest. Smaller probes then have larger packet numbers, allowing their
 acknowledgments to expose missing larger probes to packet-threshold loss
-detection.<a href="#section-3.4-1" class="pilcrow">¶</a></p>
-<p id="section-3.4-2">All packets, including probes, consume congestion window and <span class="bcp14">MUST</span> fit within the
+detection.<a href="#section-3.5-1" class="pilcrow">¶</a></p>
+<p id="section-3.5-2">All packets, including probes, consume congestion window and <span class="bcp14">MUST</span> fit within the
 available congestion window. PPDPLPMTUD <span class="bcp14">MAY</span> send the complete flight as a burst
 subject to <span><a href="https://rfc-editor.org/rfc/rfc9002#section-7.7" class="relref">Section 7.7</a> of [<a href="#RFC9002" class="cite xref">RFC9002</a>]</span>. An endpoint <span class="bcp14">SHOULD</span> send the sequence
 over substantially less than the initial RTT, or send fewer probes, to avoid
-leaving probes unsent when packet protection keys are discarded.<a href="#section-3.4-2" class="pilcrow">¶</a></p>
-<p id="section-3.4-3">PPDPLPMTUD does not change congestion control. Increasing the maximum datagram
+leaving probes unsent when packet protection keys are discarded.<a href="#section-3.5-2" class="pilcrow">¶</a></p>
+<p id="section-3.5-3">PPDPLPMTUD does not change congestion control. Increasing the maximum datagram
 size <span class="bcp14">MUST NOT</span> increase the congestion window measured in bytes. As specified by
 <span>[<a href="#RFC8899" class="cite xref">RFC8899</a>]</span> and <span>[<a href="#RFC9000" class="cite xref">RFC9000</a>]</span>, isolated loss of a packet size probe <span class="bcp14">SHOULD NOT</span> cause a
-congestion control reaction.<a href="#section-3.4-3" class="pilcrow">¶</a></p>
+congestion control reaction.<a href="#section-3.5-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="confirmation">
-<section id="section-3.5">
+<section id="section-3.6">
         <h3 id="name-confirmation">
-<a href="#section-3.5" class="section-number selfRef">3.5. </a><a href="#name-confirmation" class="section-name selfRef">Confirmation</a>
+<a href="#section-3.6" class="section-number selfRef">3.6. </a><a href="#name-confirmation" class="section-name selfRef">Confirmation</a>
         </h3>
-<p id="section-3.5-1">The sender records the packet size for every probe packet number. An
+<p id="section-3.6-1">The sender records the packet size for every probe packet number. An
 acknowledgment confirms that size and all smaller sizes. A missing
 acknowledgment does not prove that a size is unsupported: PPDPLPMTUD finds a
 confirmed lower bound, not the exact path MTU. If no probe is acknowledged, the
 endpoint retains its previous maximum. Regular DPLPMTUD can continue after the
-handshake.<a href="#section-3.5-1" class="pilcrow">¶</a></p>
+handshake.<a href="#section-3.6-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="coalesced-probes">
-<section id="section-3.6">
+<section id="section-3.7">
         <h3 id="name-coalesced-probes">
-<a href="#section-3.6" class="section-number selfRef">3.6. </a><a href="#name-coalesced-probes" class="section-name selfRef">Coalesced Probes</a>
+<a href="#section-3.7" class="section-number selfRef">3.7. </a><a href="#name-coalesced-probes" class="section-name selfRef">Coalesced Probes</a>
         </h3>
-<p id="section-3.6-1">A probe <span class="bcp14">MAY</span> be a coalesced datagram containing packets from multiple packet
+<p id="section-3.7-1">A probe <span class="bcp14">MAY</span> be a coalesced datagram containing packets from multiple packet
 number spaces, as described in Section 12.2 of <span>[<a href="#RFC9000" class="cite xref">RFC9000</a>]</span>. A client can
 coalesce Initial and 0-RTT packets; a server can coalesce Initial and Handshake
 packets, optionally followed by a 1-RTT packet. An acknowledgment of any
 coalesced packet confirms the overall packet size. This can preserve the result when
 another packet number space is discarded and improve handshake progress under
-loss.<a href="#section-3.6-1" class="pilcrow">¶</a></p>
+loss.<a href="#section-3.7-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
