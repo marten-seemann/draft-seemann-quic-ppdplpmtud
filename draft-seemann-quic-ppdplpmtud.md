@@ -106,7 +106,7 @@ Equally spaced probe sizes provide a simple alternative.
 
 For example, a client that sends its ClientHello in two 1200-byte datagrams has
 9600 bytes remaining in the 12000-byte initial congestion window defined by
-Section 7.2 of {{RFC9002}}.  With an upper probe size of 1472 bytes, it can send
+{{Section 7.2 of RFC9002}}.  With an upper probe size of 1472 bytes, it can send
 seven probes of 1472, 1433, 1394, 1355, 1317, 1278, and 1239 bytes.  The probes
 consume 9488 bytes and the complete flight consumes 11888 bytes.  Together
 with the current maximum of 1200 bytes, these sizes provide confirmation points
