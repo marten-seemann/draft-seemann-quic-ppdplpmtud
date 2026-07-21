@@ -33,8 +33,6 @@ author:
     uri: https://eggert.org/
 
 normative:
-  RFC2119:
-  RFC8174:
   RFC8899:
   RFC9000:
   RFC9001:
@@ -180,9 +178,20 @@ that budget but reveal nothing about the server-to-client Path MTU.
 
 # Path Changes
 
-Results are directional and path-specific. Migration, NAT rebinding, or routing
-changes can invalidate them. Cached results can guide probe sizes but do not
-replace confirmation on the current path.
+A confirmed maximum datagram size applies only to the network path and direction
+on which it was probed. When an endpoint starts using a different network path,
+it MUST NOT use that value without confirmation on the new path. Cached results
+can guide probe sizes but do not replace confirmation on the current path.
+
+An endpoint MAY perform PPDPLPMTUD while validating a new path. For each
+selected size, it sends a PATH_CHALLENGE frame in a 1-RTT packet and pads the
+UDP datagram to that size. The endpoint associates the packet number with the
+datagram size and uses an acknowledgment of that packet to confirm the size, as
+described in {{confirmation}}.
+
+These probes remain subject to the path-validation pacing and anti-amplification
+requirements in Section 8.2 of {{RFC9000}} and to the congestion-control
+requirements in {{order-and-timing}}.
 
 
 # Security Considerations
