@@ -160,7 +160,7 @@ congestion control reaction.
 The sender records the packet size for every probe packet number. An
 ACK confirms that size and all smaller sizes. A missing
 ACK does not prove that a size is unsupported: PPDPLPMTUD finds a
-confirmed lower bound, not the exact path MTU. If no probe is acknowledged, the
+confirmed lower bound, not the exact path MTU. If no probe is ACKed, the
 endpoint retains its previous maximum. Regular DPLPMTUD {{RFC8899}} can
 continue afterward.
 
@@ -184,7 +184,7 @@ During the 1-RTT handshake, each side abandons a packet number space --
 discarding its keys and stopping both sending and processing there -- based
 on its own progress, not on having received everything the peer sent, per
 {{Section 4.9 of RFC9001}}. The handshake MUST be able to complete even if no
-probe above the current maximum is ever acknowledged, and an endpoint SHOULD
+probe above the current maximum is ever ACKed, and an endpoint SHOULD
 send probes promptly, or send fewer of them, to avoid leaving any unsent when
 keys are discarded.
 
@@ -199,8 +199,8 @@ fit into a single probe, copies of each range SHOULD span different probe
 sizes, so the peer can assemble everything it needs from whichever probes,
 or trailing packets, survive.
 
-{{Section 13.2.1 of RFC9000}} already requires an endpoint to acknowledge
-ack-eliciting Initial and Handshake packets immediately. Since generating
+{{Section 13.2.1 of RFC9000}} already requires an endpoint to ACK
+ACK-eliciting Initial and Handshake packets immediately. Since generating
 that ACK is unavoidable once an endpoint has everything it needs to build
 its own next handshake message, it SHOULD coalesce that ACK into the same
 datagram as that message (see {{confirmation}}), so it covers the peer's
@@ -223,7 +223,7 @@ provide confirmation points approximately 39 bytes apart.
 The client does not yet know the server's `max_udp_payload_size`, so probes
 might exceed that value. Upon receiving the transport parameter, the client
 MUST cap its maximum datagram size at the smaller of that value and the
-largest acknowledged probe. An ACK does not override the transport
+largest ACKed probe. An ACK does not override the transport
 parameter. After Retry, the client MAY repeat or omit probing.
 
 ## Server
@@ -274,7 +274,7 @@ they are always processed together and neither risks the key-discard hazard
 described in {{handshake-1rtt}}. Coalescing an Initial or 0-RTT packet with a
 1-RTT packet in the same probe datagram, once 1-RTT keys are available,
 additionally hedges against loss or discard of the earlier-space packet: if
-the peer acknowledges any one of the coalesced packets, the size of the whole
+the peer ACKs any one of the coalesced packets, the size of the whole
 datagram is confirmed.
 
 ## Client
