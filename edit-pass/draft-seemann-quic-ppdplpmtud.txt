@@ -1,0 +1,475 @@
+
+
+
+
+QUIC                                                          M. Seemann
+Internet-Draft                                                          
+Intended status: Informational                                 L. Eggert
+Expires: 23 January 2027                                         Mozilla
+                                                            22 July 2026
+
+
+                   Parallel Probing DPLPMTUD for QUIC
+                  draft-seemann-quic-ppdplpmtud-latest
+
+Abstract
+
+   QUIC endpoints commonly use 1200-byte datagrams during the handshake
+   and only start Path MTU Discovery afterward.  This means that just-
+   established QUIC connections cannot immediately use larger datagrams,
+   which is especially limiting for MASQUE protocols and for
+   WebTransport.  This document defines Parallel Probing DPLPMTUD
+   (PPDPLPMTUD), which probes several packet sizes early during the QUIC
+   handshake, so a larger discovered size is usable during later
+   handshake phases and especially after handshake completion.  The same
+   discovery process is also used for path migration.
+
+About This Document
+
+   This note is to be removed before publishing as an RFC.
+
+   The latest revision of this draft can be found at https://marten-
+   seemann.github.io/draft-seemann-quic-ppdplpmtud/draft-seemann-quic-
+   ppdplpmtud.html.  Status information for this document may be found
+   at https://datatracker.ietf.org/doc/draft-seemann-quic-ppdplpmtud/.
+
+   Discussion of this document takes place on the QUIC Working Group
+   mailing list (mailto:quic@ietf.org), which is archived at
+   https://mailarchive.ietf.org/arch/browse/quic/.  Subscribe at
+   https://www.ietf.org/mailman/listinfo/quic/.
+
+   Source for this draft and an issue tracker can be found at
+   https://github.com/marten-seemann/draft-seemann-quic-ppdplpmtud.
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on 23 January 2027.
+
+Copyright Notice
+
+   Copyright (c) 2026 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+   license-info) in effect on the date of publication of this document.
+   Please review these documents carefully, as they describe your rights
+   and restrictions with respect to this document.  Code Components
+   extracted from this document must include Revised BSD License text as
+   described in Section 4.e of the Trust Legal Provisions and are
+   provided without warranty as described in the Revised BSD License.
+
+Table of Contents
+
+   1.  Introduction
+   2.  Conventions and Definitions
+   3.  The PPDPLPMTUD Mechanism
+     3.1.  Probe Size Selection
+     3.2.  Probe Construction
+     3.3.  Maximizing Congestion Window Utilization
+     3.4.  Order and Timing
+     3.5.  Congestion Control Interaction
+     3.6.  Confirmation
+     3.7.  Directionality
+   4.  PPDPLPMTUD During the 1-RTT Handshake
+     4.1.  Client
+     4.2.  Server
+     4.3.  Address Validation
+   5.  PPDPLPMTUD During a 0-RTT Handshake
+     5.1.  Coalesced Probes
+     5.2.  Client
+     5.3.  Server
+   6.  PPDPLPMTUD When Probing a New Path
+   7.  Security Considerations
+   8.  IANA Considerations
+   9.  References
+     9.1.  Normative References
+     9.2.  Informative References
+   Authors' Addresses
+
+1.  Introduction
+
+   QUIC endpoints commonly limit datagrams to 1200 bytes until Datagram
+   Packetization Layer Path MTU Discovery (DPLPMTUD) [RFC8899] confirms
+   a larger size.  Sequential probing after the handshake [RFC9000] can
+   take several round trips.
+
+   The delay is particularly undesirable for CONNECT-UDP [RFC9298],
+   CONNECT-IP [RFC9484], and CONNECT-ETHERNET
+   [I-D.ietf-masque-connect-ethernet].  Encapsulation can make 1200-byte
+   QUIC datagrams insufficient, while discovering an outer tunnel's MTU
+   can delay Path MTU Discovery by an inner transport.  WebTransport
+   over HTTP/3 [I-D.ietf-webtrans-http3] benefits similarly when using
+   QUIC DATAGRAM frames [RFC9221].
+
+   PPDPLPMTUD sends parallel probes for several distinct packet sizes
+   without waiting for individual results.  It needs no new frames or
+   transport parameters and operates independently in each direction.
+   The additional traffic is justified only when the application is
+   expected to benefit early in the connection.
+
+   This document first describes the generic PPDPLPMTUD mechanism,
+   followed by how it applies to the 1-RTT handshake, the 0-RTT
+   handshake, and when probing a new path.
+
+2.  Conventions and Definitions
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+   "OPTIONAL" in this document are to be interpreted as described in
+   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
+   capitals, as shown here.
+
+   This document uses the terminology of [RFC8899], [RFC9000],
+   [RFC9001], and [RFC9002].
+
+3.  The PPDPLPMTUD Mechanism
+
+   PPDPLPMTUD is a QUIC-specific mechanism.  It does *not* probe for the
+   MTU, i.e., it does *not* determine the *maximum* transmission unit
+   that can be used on a path.  Instead, it attempts to detect a safe
+   larger-than-minimum packet size for a given *Internet* path.
+
+   Restricting PPDPLPMTUD to Internet paths means that the maximum
+   packet size probed for is the minimum of the common 1500-byte
+   Ethernet MTU and the local interface MTU on the path towards the
+   destination.  Detection of larger packet sizes is explicitly out of
+   scope.  (Note that the configured socket send buffer size and, when
+   available, the max_udp_payload_size transport parameter further limit
+   this maximum packet size.)
+
+   This section describes the general mechanism; Section 4, Section 5,
+   and Section 6 describe how it applies in each situation.
+
+3.1.  Probe Size Selection
+
+   Probe size selection is implementation-specific.  Implementations are
+   encouraged to use information about common PMTUs and application
+   requirements.
+
+   Equally-spaced probe sizes are a simple choice.  Section 4 gives a
+   worked example of budgeting probes within an initial congestion
+   window.
+
+3.2.  Probe Construction
+
+   An endpoint selects several packet sizes above its current maximum
+   and sends an ACK-eliciting probe with a new packet number for each.
+   Frame types and packet number space depend on the situation; see
+   Section 4, Section 5, and Section 6.
+
+3.3.  Maximizing Congestion Window Utilization
+
+   The key idea of PPDPLPMTUD is to maximize use of the available
+   congestion window (cwnd) for sending parallel probes: whenever cwnd
+   headroom remains beyond what an endpoint needs for the data it is
+   already sending, PPDPLPMTUD uses that headroom to send a number of
+   packet size probes.
+
+   When an endpoint receives an acknowledgment (ACK) for a flight
+   containing probes, it determines the largest packet size successfully
+   received by the peer, which becomes the maximum datagram size for the
+   endpoint, per Section 14 of [RFC9000].
+
+3.4.  Order and Timing
+
+   Within a single packet number space, an endpoint SHOULD send probes
+   from largest to smallest.  Smaller probes then have larger packet
+   numbers, allowing their ACKs to expose missing larger probes.
+   Whether other, non-probe traffic at the current maximum packet size
+   is sent before or after the probes depends on the situation; see
+   Section 4 and Section 5.
+
+   All packets, including probes, consume congestion window and MUST fit
+   within the available congestion window.  PPDPLPMTUD MAY send a set of
+   probes as a burst subject to Section 7.7 of [RFC9002].
+
+3.5.  Congestion Control Interaction
+
+   PPDPLPMTUD does not change congestion control.  Increasing the
+   maximum datagram size MUST NOT increase the congestion window
+   measured in bytes.  As specified by [RFC8899], isolated loss of a
+   packet size probe SHOULD NOT cause a congestion control reaction.
+
+3.6.  Confirmation
+
+   The sender records the packet size for every probe packet number.  An
+   ACK confirms that size and all smaller sizes.  A missing ACK does not
+   prove that a size is unsupported: PPDPLPMTUD finds a confirmed lower
+   bound, not the exact path MTU.  If no probe is acknowledged, the
+   endpoint retains its previous maximum.  Regular DPLPMTUD [RFC8899]
+   can continue afterward.
+
+   Confirmation also depends on the sender still being able to process
+   an ACK when it arrives.  Only packets coalesced into the same UDP
+   datagram are guaranteed to be received and processed together, since
+   a datagram is delivered whole or not at all -- relevant once an
+   endpoint stops processing a packet number space it no longer needs.
+
+3.7.  Directionality
+
+   Results are directional and path-specific.  Migration, NAT rebinding,
+   or routing changes can invalidate them.  Cached results can guide
+   probe sizes but MUST NOT replace confirmation on the current path;
+   see Section 6.
+
+4.  PPDPLPMTUD During the 1-RTT Handshake
+
+   During the 1-RTT handshake, each side abandons a packet number space
+   -- discarding its keys and stopping both sending and processing there
+   -- based on its own progress, not on having received everything the
+   peer sent, per Section 4.9 of [RFC9001].  The handshake MUST be able
+   to complete even if no probe above the current maximum is ever
+   acknowledged, and an endpoint SHOULD send probes promptly, or send
+   fewer of them, to avoid leaving any unsent when keys are discarded.
+
+   An endpoint therefore sends its probes before its essential handshake
+   data -- the ClientHello for a client, or the Certificate,
+   CertificateVerify, and Finished for a server -- which it sends in
+   packets no larger than its current maximum.  New, non-retransmitted
+   data MUST use the sender's highest currently-available encryption
+   level; probes SHOULD instead carry copies of that essential CRYPTO
+   data, which, being a retransmission, remains permitted at a previous
+   level, per Section 4.9 of [RFC9001].  Where the data does not fit
+   into a single probe, copies of each range SHOULD span different probe
+   sizes, so the peer can assemble everything it needs from whichever
+   probes, or trailing packets, survive.
+
+   Section 13.2.1 of [RFC9000] already requires an endpoint to
+   acknowledge ack-eliciting Initial and Handshake packets immediately.
+   Since generating that ACK is unavoidable once an endpoint has
+   everything it needs to build its own next handshake message, it
+   SHOULD coalesce that ACK into the same datagram as that message (see
+   Section 3.6), so it covers the peer's probes too without waiting for
+   the rest of the flight.
+
+   The Client and Server sections below cover what differs between the
+   two first flights.
+
+4.1.  Client
+
+   For example, within the 12000-byte initial congestion window defined
+   by Section 7.2 of [RFC9002], a client can reserve 2400 bytes at the
+   end for its ClientHello, sent as two 1200-byte datagrams, leaving
+   9600 bytes for probes sent first.  With an upper probe size of 1472
+   bytes, it can send seven probes of 1472, 1433, 1394, 1355, 1317,
+   1278, and 1239 bytes, followed by the ClientHello.  The probes
+   consume 9488 bytes and the complete flight consumes 11888 bytes.
+   Together with the current maximum of 1200 bytes, these sizes provide
+   confirmation points approximately 39 bytes apart.
+
+   The client does not yet know the server's max_udp_payload_size, so
+   probes might exceed that value.  Upon receiving the transport
+   parameter, the client MUST cap its maximum datagram size at the
+   smaller of that value and the largest acknowledged probe.  An ACK
+   does not override the transport parameter.  After Retry, the client
+   MAY repeat or omit probing.
+
+4.2.  Server
+
+   After processing the ClientHello, the server knows the client's
+   max_udp_payload_size and MUST NOT exceed it.
+
+   By the time it builds this flight, the server already has both
+   Handshake and 1-RTT keys, unlike the client's first flight, where
+   Initial is the only level available.  A probe MAY instead just
+   contain a PING frame and enough PADDING frames to reach the selected
+   size; since that is new data rather than a CRYPTO retransmission, it
+   MUST then use 1-RTT rather than Handshake.
+
+4.3.  Address Validation
+
+   Before address validation, every probe byte counts against the
+   server's anti-amplification limit defined in Section 8.1 of
+   [RFC9000].  The server MUST prioritize handshake data and send fewer
+   probes or none when its budget is insufficient.  Client probes
+   increase that budget.
+
+5.  PPDPLPMTUD During a 0-RTT Handshake
+
+   0-RTT and 1-RTT packets share the same packet number space, and a
+   client never sends a 0-RTT packet after it has sent a 1-RTT packet,
+   per Section 4.9.3 of [RFC9001].  A size confirmed by an ACK of a
+   0-RTT probe therefore applies directly to subsequent 1-RTT packets.
+
+   A client SHOULD send its 0-RTT application data in packets at the
+   current maximum packet size to avoid size-based loss.
+
+   Any remaining cwnd can then be used to send packet-size probes.
+   CRYPTO frames cannot be sent in 0-RTT packets, per Section 12.5 of
+   [RFC9000], so a 0-RTT probe cannot use the redundant-CRYPTO-copy
+   construction described for the handshake.  A probe can still contain
+   a PING frame and enough PADDING frames to reach the selected size.
+   Similarly to the redundant CRYPTO copies, the client MAY also
+   opportunistically retransmit STREAM data in probe packets.
+
+5.1.  Coalesced Probes
+
+   A probe MAY be a coalesced datagram containing packets from multiple
+   encryption levels, as described in Section 12.2 of [RFC9000].  A
+   client can coalesce its Initial and 0-RTT packets this way.  Because
+   both are part of the client's first flight, they are always processed
+   together and neither risks the key-discard hazard described in
+   Section 4.  Coalescing an Initial or 0-RTT packet with a 1-RTT packet
+   in the same probe datagram, once 1-RTT keys are available,
+   additionally hedges against loss or discard of the earlier-space
+   packet: if the peer acknowledges any one of the coalesced packets,
+   the size of the whole datagram is confirmed.
+
+5.2.  Client
+
+   0-RTT data and probes share the initial congestion window.  A few
+   small requests can leave room for probing, but more 0-RTT data makes
+   probing less useful; the client MAY then send fewer probes, omit
+   PPDPLPMTUD, or retransmit STREAM data as described above to avoid the
+   tradeoff.
+
+   A client that attempts 0-RTT MUST remember the server's previously
+   provided max_udp_payload_size, per Section 7.4.1 of [RFC9000].
+
+   A server MAY reject 0-RTT instead of selecting a smaller value than
+   it previously provided, but this check is optional, so an accepted
+   handshake does not guarantee the remembered value still holds; the
+   client MUST still cap on the actual transport parameter once
+   received, as in the 1-RTT case.  Unlike in a 1-RTT handshake, where
+   the client has no prior information, a 0-RTT client has an upper
+   bound to size its probes against.  If the server rejects 0-RTT, the
+   client falls back to the 1-RTT handshake behavior.
+
+5.3.  Server
+
+   Anti-amplification limits apply before address validation just as
+   during a 1-RTT handshake (see Section 4.3).  The server MUST
+   prioritize processing the ClientHello and any 0-RTT data it accepts,
+   sending probes only within the remaining congestion window; since the
+   server has 1-RTT keys available essentially as soon as it starts
+   building its response, these probes use 1-RTT PING and PADDING
+   frames, for the same reason given for the 1-RTT handshake.
+
+6.  PPDPLPMTUD When Probing a New Path
+
+   QUIC endpoints validate a new path, as described in Section 8.2 of
+   [RFC9000].  Before committing to migrate there, an endpoint can test
+   a new path's viability, including the packet sizes it supports, using
+   only "probing frames" (Section 9.1 of [RFC9000]): a PPDPLPMTUD probe
+   on a not-yet-validated path is a packet built from PADDING together
+   with a PATH_CHALLENGE, PATH_RESPONSE, or NEW_CONNECTION_ID frame,
+   padded to the selected probe size.
+
+   Before the new address is validated, an endpoint sending to it MUST
+   NOT send more than three times the bytes it has received from that
+   address, per Section 21.1.1.1 of [RFC9000].  Any datagram containing
+   a PATH_CHALLENGE frame MUST already be expanded to at least the
+   minimum QUIC datagram size of 1200 bytes unless the anti-
+   amplification limit does not permit it, per Section 8.2.1 of
+   [RFC9000]; PPDPLPMTUD probes extend above that floor.
+
+   Once path validation succeeds, an endpoint MUST reset its congestion
+   controller and RTT estimator for that path to their initial values,
+   per Section 9.4 of [RFC9000].  PPDPLPMTUD can now run an additional
+   probing round the same way as during the handshake (see Section 3),
+   no longer confined to probing frames.
+
+   A confirmed size becomes usable once the endpoint takes the new path
+   into use for transmission; results from the path being replaced do
+   not carry over.
+
+7.  Security Considerations
+
+   The security considerations of [RFC8899], [RFC9000], [RFC9001], and
+   [RFC9002] apply.
+
+   PPDPLPMTUD adds traffic and processing during connection
+   establishment and can cause a short burst of queueing or loss.
+   Implementations SHOULD use only as many sizes as provide useful
+   resolution and SHOULD disable probing on metered networks.  Probe
+   sizes can also fingerprint an implementation.
+
+8.  IANA Considerations
+
+   This document has no IANA actions.
+
+9.  References
+
+9.1.  Normative References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+   [RFC8899]  Fairhurst, G., Jones, T., Tüxen, M., Rüngeler, I., and T.
+              Völker, "Packetization Layer Path MTU Discovery for
+              Datagram Transports", RFC 8899, DOI 10.17487/RFC8899,
+              September 2020, <https://www.rfc-editor.org/rfc/rfc8899>.
+
+   [RFC9000]  Iyengar, J., Ed. and M. Thomson, Ed., "QUIC: A UDP-Based
+              Multiplexed and Secure Transport", RFC 9000,
+              DOI 10.17487/RFC9000, May 2021,
+              <https://www.rfc-editor.org/rfc/rfc9000>.
+
+   [RFC9001]  Thomson, M., Ed. and S. Turner, Ed., "Using TLS to Secure
+              QUIC", RFC 9001, DOI 10.17487/RFC9001, May 2021,
+              <https://www.rfc-editor.org/rfc/rfc9001>.
+
+   [RFC9002]  Iyengar, J., Ed. and I. Swett, Ed., "QUIC Loss Detection
+              and Congestion Control", RFC 9002, DOI 10.17487/RFC9002,
+              May 2021, <https://www.rfc-editor.org/rfc/rfc9002>.
+
+9.2.  Informative References
+
+   [I-D.ietf-masque-connect-ethernet]
+              Sedeño, A., "Proxying Ethernet Frames in HTTP", Work in
+              Progress, Internet-Draft, draft-ietf-masque-connect-
+              ethernet-11, 22 July 2026,
+              <https://datatracker.ietf.org/doc/html/draft-ietf-masque-
+              connect-ethernet-11>.
+
+   [I-D.ietf-webtrans-http3]
+              Frindell, A., Kinnear, E., and V. Vasiliev, "WebTransport
+              over HTTP/3", Work in Progress, Internet-Draft, draft-
+              ietf-webtrans-http3-16, 6 July 2026,
+              <https://datatracker.ietf.org/doc/html/draft-ietf-
+              webtrans-http3-16>.
+
+   [RFC9221]  Pauly, T., Kinnear, E., and D. Schinazi, "An Unreliable
+              Datagram Extension to QUIC", RFC 9221,
+              DOI 10.17487/RFC9221, March 2022,
+              <https://www.rfc-editor.org/rfc/rfc9221>.
+
+   [RFC9298]  Schinazi, D., "Proxying UDP in HTTP", RFC 9298,
+              DOI 10.17487/RFC9298, August 2022,
+              <https://www.rfc-editor.org/rfc/rfc9298>.
+
+   [RFC9484]  Pauly, T., Ed., Schinazi, D., Chernyakhovsky, A.,
+              Kühlewind, M., and M. Westerlund, "Proxying IP in HTTP",
+              RFC 9484, DOI 10.17487/RFC9484, October 2023,
+              <https://www.rfc-editor.org/rfc/rfc9484>.
+
+Authors' Addresses
+
+   Marten Seemann
+   Email: martenseemann@gmail.com
+
+
+   Lars Eggert
+   Mozilla
+   Email: lars@eggert.org
+   URI:   https://eggert.org/
