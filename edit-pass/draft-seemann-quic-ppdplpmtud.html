@@ -1367,7 +1367,7 @@ congestion control reaction.<a href="#section-3.5-1" class="pilcrow">¶</a></p>
 <p id="section-3.6-1">The sender records the packet size for every probe packet number. An
 ACK confirms that size and all smaller sizes. A missing
 ACK does not prove that a size is unsupported: PPDPLPMTUD finds a
-confirmed lower bound, not the exact path MTU. If no probe is acknowledged, the
+confirmed lower bound, not the exact path MTU. If no probe is ACKed, the
 endpoint retains its previous maximum. Regular DPLPMTUD <span>[<a href="#RFC8899" class="cite xref">RFC8899</a>]</span> can
 continue afterward.<a href="#section-3.6-1" class="pilcrow">¶</a></p>
 <p id="section-3.6-2">Confirmation also depends on the sender still being able to process an ACK
@@ -1398,7 +1398,7 @@ replace confirmation on the current path; see <a href="#new-path" class="auto in
 discarding its keys and stopping both sending and processing there -- based
 on its own progress, not on having received everything the peer sent, per
 <span><a href="https://rfc-editor.org/rfc/rfc9001#section-4.9" class="relref">Section 4.9</a> of [<a href="#RFC9001" class="cite xref">RFC9001</a>]</span>. The handshake <span class="bcp14">MUST</span> be able to complete even if no
-probe above the current maximum is ever acknowledged, and an endpoint <span class="bcp14">SHOULD</span>
+probe above the current maximum is ever ACKed, and an endpoint <span class="bcp14">SHOULD</span>
 send probes promptly, or send fewer of them, to avoid leaving any unsent when
 keys are discarded.<a href="#section-4-1" class="pilcrow">¶</a></p>
 <p id="section-4-2">An endpoint therefore sends its probes before its essential handshake data --
@@ -1411,8 +1411,8 @@ at a previous level, per <span><a href="https://rfc-editor.org/rfc/rfc9001#secti
 fit into a single probe, copies of each range <span class="bcp14">SHOULD</span> span different probe
 sizes, so the peer can assemble everything it needs from whichever probes,
 or trailing packets, survive.<a href="#section-4-2" class="pilcrow">¶</a></p>
-<p id="section-4-3"><span><a href="https://rfc-editor.org/rfc/rfc9000#section-13.2.1" class="relref">Section 13.2.1</a> of [<a href="#RFC9000" class="cite xref">RFC9000</a>]</span> already requires an endpoint to acknowledge
-ack-eliciting Initial and Handshake packets immediately. Since generating
+<p id="section-4-3"><span><a href="https://rfc-editor.org/rfc/rfc9000#section-13.2.1" class="relref">Section 13.2.1</a> of [<a href="#RFC9000" class="cite xref">RFC9000</a>]</span> already requires an endpoint to ACK
+ACK-eliciting Initial and Handshake packets immediately. Since generating
 that ACK is unavoidable once an endpoint has everything it needs to build
 its own next handshake message, it <span class="bcp14">SHOULD</span> coalesce that ACK into the same
 datagram as that message (see <a href="#confirmation" class="auto internal xref">Section 3.6</a>), so it covers the peer's
@@ -1435,7 +1435,7 @@ provide confirmation points approximately 39 bytes apart.<a href="#section-4.1-1
 <p id="section-4.1-2">The client does not yet know the server's <code>max_udp_payload_size</code>, so probes
 might exceed that value. Upon receiving the transport parameter, the client
 <span class="bcp14">MUST</span> cap its maximum datagram size at the smaller of that value and the
-largest acknowledged probe. An ACK does not override the transport
+largest ACKed probe. An ACK does not override the transport
 parameter. After Retry, the client <span class="bcp14">MAY</span> repeat or omit probing.<a href="#section-4.1-2" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -1497,7 +1497,7 @@ they are always processed together and neither risks the key-discard hazard
 described in <a href="#handshake-1rtt" class="auto internal xref">Section 4</a>. Coalescing an Initial or 0-RTT packet with a
 1-RTT packet in the same probe datagram, once 1-RTT keys are available,
 additionally hedges against loss or discard of the earlier-space packet: if
-the peer acknowledges any one of the coalesced packets, the size of the whole
+the peer ACKs any one of the coalesced packets, the size of the whole
 datagram is confirmed.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
 </section>
 </div>
