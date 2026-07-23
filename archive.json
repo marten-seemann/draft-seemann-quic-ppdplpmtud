@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-07-21T00:29:17.116084+00:00",
+  "timestamp": "2026-07-23T00:29:51.678268+00:00",
   "repo": "marten-seemann/draft-seemann-quic-ppdplpmtud",
   "labels": [
     {
@@ -49,6 +49,274 @@
       "color": "ffffff"
     }
   ],
-  "issues": [],
-  "pulls": []
+  "issues": [
+    {
+      "number": 6,
+      "id": "I_kwDOTeG0yc8AAAABJt5XCQ",
+      "title": "Greyholes",
+      "url": "https://github.com/marten-seemann/draft-seemann-quic-ppdplpmtud/issues/6",
+      "state": "OPEN",
+      "author": "larseggert",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "@mjoras reminded me of \"greyholes\", i.e., paths where large packets have (much) higher loss rates than small packets, but don't fail consistently. I've seen this at Mozilla, too. Do we need to do anything about them?",
+      "createdAt": "2026-07-22T08:32:32Z",
+      "updatedAt": "2026-07-22T08:32:32Z",
+      "closedAt": null,
+      "comments": []
+    }
+  ],
+  "pulls": [
+    {
+      "number": 1,
+      "id": "PR_kwDOTeG0yc70Pn_3",
+      "title": "Add myself",
+      "url": "https://github.com/marten-seemann/draft-seemann-quic-ppdplpmtud/pull/1",
+      "state": "MERGED",
+      "author": "larseggert",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-07-21T08:08:20Z",
+      "updatedAt": "2026-07-21T08:13:33Z",
+      "baseRepository": "marten-seemann/draft-seemann-quic-ppdplpmtud",
+      "baseRefName": "main",
+      "baseRefOid": "760e5df3ae0bd6a24cc185985c96c4aa121ebee4",
+      "headRepository": "marten-seemann/draft-seemann-quic-ppdplpmtud",
+      "headRefName": "larseggert",
+      "headRefOid": "0dc9f62a31acce49986b7ae7309480a65abf1c4e",
+      "closedAt": "2026-07-21T08:13:33Z",
+      "mergedAt": "2026-07-21T08:13:33Z",
+      "mergedBy": "marten-seemann",
+      "mergeCommit": {
+        "oid": "132a35dc90b4b2ef3971f65caaf3f48343f57038"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOTeG0yc8AAAABGq3P2Q",
+          "commit": {
+            "abbreviatedOid": "6993bb8"
+          },
+          "author": "marten-seemann",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-07-21T08:12:08Z",
+          "updatedAt": "2026-07-21T08:12:08Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "id": "PR_kwDOTeG0yc70P8eV",
+      "title": "specify PMTUD during path probing",
+      "url": "https://github.com/marten-seemann/draft-seemann-quic-ppdplpmtud/pull/2",
+      "state": "MERGED",
+      "author": "marten-seemann",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-07-21T08:21:51Z",
+      "updatedAt": "2026-07-21T08:32:11Z",
+      "baseRepository": "marten-seemann/draft-seemann-quic-ppdplpmtud",
+      "baseRefName": "main",
+      "baseRefOid": "132a35dc90b4b2ef3971f65caaf3f48343f57038",
+      "headRepository": "marten-seemann/draft-seemann-quic-ppdplpmtud",
+      "headRefName": "path-migration",
+      "headRefOid": "35af9578cdeb617e7bbae57b060b33de8efc9e8b",
+      "closedAt": "2026-07-21T08:32:09Z",
+      "mergedAt": "2026-07-21T08:32:09Z",
+      "mergedBy": "larseggert",
+      "mergeCommit": {
+        "oid": "21a0e6f7f7b10460bab5450c933ced8a8b5ca2a1"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOTeG0yc8AAAABGq__ww",
+          "commit": {
+            "abbreviatedOid": "35af957"
+          },
+          "author": "larseggert",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-07-21T08:32:04Z",
+          "updatedAt": "2026-07-21T08:32:04Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "id": "PR_kwDOTeG0yc70RV9G",
+      "title": "add some guidance on probe size selection",
+      "url": "https://github.com/marten-seemann/draft-seemann-quic-ppdplpmtud/pull/3",
+      "state": "MERGED",
+      "author": "marten-seemann",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-07-21T09:17:07Z",
+      "updatedAt": "2026-07-21T12:24:28Z",
+      "baseRepository": "marten-seemann/draft-seemann-quic-ppdplpmtud",
+      "baseRefName": "main",
+      "baseRefOid": "21a0e6f7f7b10460bab5450c933ced8a8b5ca2a1",
+      "headRepository": "marten-seemann/draft-seemann-quic-ppdplpmtud",
+      "headRefName": "probe-size-selection",
+      "headRefOid": "d9640537ee8835b5265b98b8f569656d0c501f8f",
+      "closedAt": "2026-07-21T12:24:26Z",
+      "mergedAt": "2026-07-21T12:24:26Z",
+      "mergedBy": "larseggert",
+      "mergeCommit": {
+        "oid": "61c9dcf3b8a00cf246a63118279005b300d5e29e"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOTeG0yc8AAAABGss0eQ",
+          "commit": {
+            "abbreviatedOid": "d964053"
+          },
+          "author": "larseggert",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-07-21T12:24:20Z",
+          "updatedAt": "2026-07-21T12:24:20Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "id": "PR_kwDOTeG0yc70R5SH",
+      "title": "remove nonsensical sentence about parallel sequences",
+      "url": "https://github.com/marten-seemann/draft-seemann-quic-ppdplpmtud/pull/4",
+      "state": "MERGED",
+      "author": "marten-seemann",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-07-21T09:39:28Z",
+      "updatedAt": "2026-07-21T09:40:09Z",
+      "baseRepository": "marten-seemann/draft-seemann-quic-ppdplpmtud",
+      "baseRefName": "main",
+      "baseRefOid": "21a0e6f7f7b10460bab5450c933ced8a8b5ca2a1",
+      "headRepository": "marten-seemann/draft-seemann-quic-ppdplpmtud",
+      "headRefName": "remove-parallel-sequenences",
+      "headRefOid": "fd890817b1a6c07833b0dad27a85f7302ebde7c4",
+      "closedAt": "2026-07-21T09:40:09Z",
+      "mergedAt": "2026-07-21T09:40:09Z",
+      "mergedBy": "marten-seemann",
+      "mergeCommit": {
+        "oid": "15705ddcf592177b33d57941640ae5a367f4a9e9"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 5,
+      "id": "PR_kwDOTeG0yc70Sc-B",
+      "title": "Edits from this morning",
+      "url": "https://github.com/marten-seemann/draft-seemann-quic-ppdplpmtud/pull/5",
+      "state": "MERGED",
+      "author": "larseggert",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-07-21T10:01:22Z",
+      "updatedAt": "2026-07-21T10:16:53Z",
+      "baseRepository": "marten-seemann/draft-seemann-quic-ppdplpmtud",
+      "baseRefName": "main",
+      "baseRefOid": "15705ddcf592177b33d57941640ae5a367f4a9e9",
+      "headRepository": "marten-seemann/draft-seemann-quic-ppdplpmtud",
+      "headRefName": "edits",
+      "headRefOid": "782f5832e3fab1e59a98c537a9c74304897263bf",
+      "closedAt": "2026-07-21T10:16:52Z",
+      "mergedAt": "2026-07-21T10:16:52Z",
+      "mergedBy": "marten-seemann",
+      "mergeCommit": {
+        "oid": "8f71c7e20706198c518e19d1e0f17970fdce2c31"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOTeG0yc8AAAABGrsvNw",
+          "commit": {
+            "abbreviatedOid": "73e4c08"
+          },
+          "author": "marten-seemann",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-07-21T10:06:33Z",
+          "updatedAt": "2026-07-21T10:12:42Z",
+          "comments": [
+            {
+              "originalPosition": 16,
+              "body": "```suggestion\nstart Path MTU Discovery afterward. This means that just-established QUIC\n```",
+              "createdAt": "2026-07-21T10:06:33Z",
+              "updatedAt": "2026-07-21T10:12:43Z"
+            },
+            {
+              "originalPosition": 96,
+              "body": "This is wrong, will fix in a follow-up PR.",
+              "createdAt": "2026-07-21T10:12:05Z",
+              "updatedAt": "2026-07-21T10:12:43Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 7,
+      "id": "PR_kwDOTeG0yc707Nh3",
+      "title": "Many edits",
+      "url": "https://github.com/marten-seemann/draft-seemann-quic-ppdplpmtud/pull/7",
+      "state": "OPEN",
+      "author": "larseggert",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-07-22T14:46:48Z",
+      "updatedAt": "2026-07-22T15:11:14Z",
+      "baseRepository": "marten-seemann/draft-seemann-quic-ppdplpmtud",
+      "baseRefName": "main",
+      "baseRefOid": "61c9dcf3b8a00cf246a63118279005b300d5e29e",
+      "headRepository": "marten-seemann/draft-seemann-quic-ppdplpmtud",
+      "headRefName": "edit-pass",
+      "headRefOid": "3b3ac7cf97f7343d91ca632c82e05cc299f143f0",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "marten-seemann",
+          "authorAssociation": "OWNER",
+          "body": "We already merged #5. How is this different?",
+          "createdAt": "2026-07-22T14:53:31Z",
+          "updatedAt": "2026-07-22T14:53:31Z"
+        },
+        {
+          "author": "larseggert",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I messed up my branches. Force pushed the correct changes. Let's discuss in code review.",
+          "createdAt": "2026-07-22T15:08:51Z",
+          "updatedAt": "2026-07-22T15:08:51Z"
+        }
+      ],
+      "reviews": []
+    }
+  ]
 }
