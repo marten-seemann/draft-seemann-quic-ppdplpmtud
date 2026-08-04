@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-07-23T00:29:51.678268+00:00",
+  "timestamp": "2026-08-04T00:30:05.350382+00:00",
   "repo": "marten-seemann/draft-seemann-quic-ppdplpmtud",
   "labels": [
     {
@@ -289,7 +289,7 @@
       "labels": [],
       "body": "",
       "createdAt": "2026-07-22T14:46:48Z",
-      "updatedAt": "2026-07-22T15:11:14Z",
+      "updatedAt": "2026-08-02T02:40:32Z",
       "baseRepository": "marten-seemann/draft-seemann-quic-ppdplpmtud",
       "baseRefName": "main",
       "baseRefOid": "61c9dcf3b8a00cf246a63118279005b300d5e29e",
@@ -316,7 +316,52 @@
           "updatedAt": "2026-07-22T15:08:51Z"
         }
       ],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDOTeG0yc8AAAABHfBdSQ",
+          "commit": {
+            "abbreviatedOid": "3b3ac7c"
+          },
+          "author": "marten-seemann",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "Thank you @larseggert, just a few nits.",
+          "createdAt": "2026-07-28T12:34:59Z",
+          "updatedAt": "2026-08-02T02:40:32Z",
+          "comments": [
+            {
+              "originalPosition": 140,
+              "body": "```suggestion\nconfirmed lower bound, not the exact path MTU. If no probe is acknowledged, the\n```",
+              "createdAt": "2026-07-28T12:34:59Z",
+              "updatedAt": "2026-08-02T02:40:32Z"
+            },
+            {
+              "originalPosition": 195,
+              "body": "I don't understand what this paragraph is trying to say. Why do we need to say anything?",
+              "createdAt": "2026-07-29T03:36:38Z",
+              "updatedAt": "2026-08-02T02:40:32Z"
+            },
+            {
+              "originalPosition": 226,
+              "body": "```suggestion\nlargest acknowledged probe. An ACK does not override the transport\n```",
+              "createdAt": "2026-07-29T03:38:14Z",
+              "updatedAt": "2026-08-02T02:40:32Z"
+            },
+            {
+              "originalPosition": 264,
+              "body": "That's a trivial statement, and it applies to the 1-RTT handshake as well: Path MTUs don't depend on the QUIC packet number space.",
+              "createdAt": "2026-07-29T04:38:32Z",
+              "updatedAt": "2026-08-02T02:40:32Z"
+            },
+            {
+              "originalPosition": 320,
+              "body": "This sentence doesn't make sense, processing the ClientHello and 0-RTT data doesn't compete with sending probe packets.",
+              "createdAt": "2026-08-02T02:37:35Z",
+              "updatedAt": "2026-08-02T02:40:32Z"
+            }
+          ]
+        }
+      ]
     }
   ]
 }
