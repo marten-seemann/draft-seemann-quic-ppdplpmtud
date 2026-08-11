@@ -223,7 +223,7 @@ provide confirmation points approximately 39 bytes apart.
 The client does not yet know the server's `max_udp_payload_size`, so probes
 might exceed that value. Upon receiving the transport parameter, the client
 MUST cap its maximum datagram size at the smaller of that value and the
-largest ACKed probe. An ACK does not override the transport
+largest acknowledged probe. An ACK does not override the transport
 parameter. After Retry, the client MAY repeat or omit probing.
 
 ## Server
