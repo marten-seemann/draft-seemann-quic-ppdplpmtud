@@ -1432,7 +1432,7 @@ provide confirmation points approximately 39 bytes apart.<a href="#section-4.1-1
 <p id="section-4.1-2">The client does not yet know the server's <code>max_udp_payload_size</code>, so probes
 might exceed that value. Upon receiving the transport parameter, the client
 <span class="bcp14">MUST</span> cap its maximum datagram size at the smaller of that value and the
-largest ACKed probe. An ACK does not override the transport
+largest acknowledged probe. An ACK does not override the transport
 parameter. After Retry, the client <span class="bcp14">MAY</span> repeat or omit probing.<a href="#section-4.1-2" class="pilcrow">¶</a></p>
 </section>
 </div>
