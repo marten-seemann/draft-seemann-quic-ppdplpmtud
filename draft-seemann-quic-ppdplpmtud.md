@@ -160,7 +160,7 @@ congestion control reaction.
 The sender records the packet size for every probe packet number. An
 ACK confirms that size and all smaller sizes. A missing
 ACK does not prove that a size is unsupported: PPDPLPMTUD finds a
-confirmed lower bound, not the exact path MTU. If no probe is ACKed, the
+confirmed lower bound, not the exact path MTU. If no probe is acknowledged, the
 endpoint retains its previous maximum. Regular DPLPMTUD {{RFC8899}} can
 continue afterward.
 
