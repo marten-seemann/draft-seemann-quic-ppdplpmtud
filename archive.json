@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-08-04T00:30:05.350382+00:00",
+  "timestamp": "2026-08-13T00:19:31.526894+00:00",
   "repo": "marten-seemann/draft-seemann-quic-ppdplpmtud",
   "labels": [
     {
@@ -289,13 +289,13 @@
       "labels": [],
       "body": "",
       "createdAt": "2026-07-22T14:46:48Z",
-      "updatedAt": "2026-08-02T02:40:32Z",
+      "updatedAt": "2026-08-11T07:01:40Z",
       "baseRepository": "marten-seemann/draft-seemann-quic-ppdplpmtud",
       "baseRefName": "main",
       "baseRefOid": "61c9dcf3b8a00cf246a63118279005b300d5e29e",
       "headRepository": "marten-seemann/draft-seemann-quic-ppdplpmtud",
       "headRefName": "edit-pass",
-      "headRefOid": "3b3ac7cf97f7343d91ca632c82e05cc299f143f0",
+      "headRefOid": "d23cb31c11cf6c1d038aabe6475af61bdebd2dc1",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
@@ -358,6 +358,46 @@
               "body": "This sentence doesn't make sense, processing the ClientHello and 0-RTT data doesn't compete with sending probe packets.",
               "createdAt": "2026-08-02T02:37:35Z",
               "updatedAt": "2026-08-02T02:40:32Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOTeG0yc8AAAABJEi8sQ",
+          "commit": {
+            "abbreviatedOid": "3b3ac7c"
+          },
+          "author": "larseggert",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-08-11T07:01:18Z",
+          "updatedAt": "2026-08-11T07:01:18Z",
+          "comments": [
+            {
+              "originalPosition": 195,
+              "body": "The point is that because Initial and Handshake spac3s require immediate ACKs, the probes are guaranteed to be promptly ACKed (and not delayed).",
+              "createdAt": "2026-08-11T07:01:18Z",
+              "updatedAt": "2026-08-11T07:01:18Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOTeG0yc8AAAABJEjE_g",
+          "commit": {
+            "abbreviatedOid": "3b3ac7c"
+          },
+          "author": "larseggert",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-08-11T07:01:40Z",
+          "updatedAt": "2026-08-11T07:01:40Z",
+          "comments": [
+            {
+              "originalPosition": 264,
+              "body": "You mean the final sentence? Agreed.",
+              "createdAt": "2026-08-11T07:01:40Z",
+              "updatedAt": "2026-08-11T07:01:41Z"
             }
           ]
         }
