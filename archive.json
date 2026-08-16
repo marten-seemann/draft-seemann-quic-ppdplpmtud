@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-08-13T00:19:31.526894+00:00",
+  "timestamp": "2026-08-16T00:10:18.044760+00:00",
   "repo": "marten-seemann/draft-seemann-quic-ppdplpmtud",
   "labels": [
     {
@@ -282,24 +282,26 @@
       "id": "PR_kwDOTeG0yc707Nh3",
       "title": "Many edits",
       "url": "https://github.com/marten-seemann/draft-seemann-quic-ppdplpmtud/pull/7",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "larseggert",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "",
       "createdAt": "2026-07-22T14:46:48Z",
-      "updatedAt": "2026-08-11T07:01:40Z",
+      "updatedAt": "2026-08-15T14:50:56Z",
       "baseRepository": "marten-seemann/draft-seemann-quic-ppdplpmtud",
       "baseRefName": "main",
       "baseRefOid": "61c9dcf3b8a00cf246a63118279005b300d5e29e",
       "headRepository": "marten-seemann/draft-seemann-quic-ppdplpmtud",
       "headRefName": "edit-pass",
       "headRefOid": "d23cb31c11cf6c1d038aabe6475af61bdebd2dc1",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2026-08-15T14:50:56Z",
+      "mergedAt": "2026-08-15T14:50:55Z",
+      "mergedBy": "marten-seemann",
+      "mergeCommit": {
+        "oid": "82a77b9cbb06a2d7619e9fb89e1428a3d09825a1"
+      },
       "comments": [
         {
           "author": "marten-seemann",
@@ -400,6 +402,19 @@
               "updatedAt": "2026-08-11T07:01:41Z"
             }
           ]
+        },
+        {
+          "id": "PRR_kwDOTeG0yc8AAAABJrBfXw",
+          "commit": {
+            "abbreviatedOid": "d23cb31"
+          },
+          "author": "marten-seemann",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-08-15T14:50:46Z",
+          "updatedAt": "2026-08-15T14:50:46Z",
+          "comments": []
         }
       ]
     }
