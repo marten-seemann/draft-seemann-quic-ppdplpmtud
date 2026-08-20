@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-08-16T00:10:18.044760+00:00",
+  "timestamp": "2026-08-20T00:10:14.324692+00:00",
   "repo": "marten-seemann/draft-seemann-quic-ppdplpmtud",
   "labels": [
     {
@@ -63,6 +63,109 @@
       "body": "@mjoras reminded me of \"greyholes\", i.e., paths where large packets have (much) higher loss rates than small packets, but don't fail consistently. I've seen this at Mozilla, too. Do we need to do anything about them?",
       "createdAt": "2026-07-22T08:32:32Z",
       "updatedAt": "2026-07-22T08:32:32Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 8,
+      "id": "I_kwDOTeG0yc8AAAABNSiDzQ",
+      "title": "Be clearer about initial CWND",
+      "url": "https://github.com/marten-seemann/draft-seemann-quic-ppdplpmtud/issues/8",
+      "state": "OPEN",
+      "author": "martinthomson",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "The doc talks a lot about filling CWND, but it doesn't acknowledge that this will happen when no feedback about the path has been received.  Consequently, the initial value of CWND is going to determine how this operates.  Just be up front about that.",
+      "createdAt": "2026-08-18T22:15:53Z",
+      "updatedAt": "2026-08-18T22:18:35Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "martinthomson",
+          "authorAssociation": "NONE",
+          "body": "For example, \n\n> PPDPLPMTUD MAY send a set of probes as a burst subject to [Section 7.7](https://rfc-editor.org/rfc/rfc9002#section-7.7) of [[RFC9002](https://www.rfc-editor.org/rfc/rfc9002)].\n\nThe referenced text suggests that bursts be limited to the initial congestion window. That fits neatly with the design here.",
+          "createdAt": "2026-08-18T22:18:35Z",
+          "updatedAt": "2026-08-18T22:18:35Z"
+        }
+      ]
+    },
+    {
+      "number": 9,
+      "id": "I_kwDOTeG0yc8AAAABNSk9iA",
+      "title": "Don't assume that only the last packet will have CRYPTO frames",
+      "url": "https://github.com/marten-seemann/draft-seemann-quic-ppdplpmtud/issues/9",
+      "state": "OPEN",
+      "author": "martinthomson",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "Instead, suggest that the probes can carry redundant copies of data, which improves the chances that the handshake data is available.\n\nIt looks like the neqo implementation sends CRYPTO data in every packet it sends, which is good.",
+      "createdAt": "2026-08-18T22:21:49Z",
+      "updatedAt": "2026-08-18T22:21:49Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 10,
+      "id": "I_kwDOTeG0yc8AAAABNSmVhA",
+      "title": "Server DoS protection and Retry",
+      "url": "https://github.com/marten-seemann/draft-seemann-quic-ppdplpmtud/issues/10",
+      "state": "OPEN",
+      "author": "martinthomson",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "A server that receives additional probes will need to handle them.  That can increase server load.\n\nWhat should this do if the server decides a Retry is necessary?  It doesn't need to reply to every packet it gets (though it could), which means that the first flight will be effectively lost.  A client needs to deal with that properly.",
+      "createdAt": "2026-08-18T22:24:46Z",
+      "updatedAt": "2026-08-18T22:40:17Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "martinthomson",
+          "authorAssociation": "NONE",
+          "body": "I don't know if this belongs here or on #11, but the way that the document handles unwanted 0-RTT will determine what a client can attempt with 0-RTT.  If the client chooses to send pure 0-RTT packets *first*, that creates a state commitment on the server that is hard to justify.  How we manage that is going to be very tricky to think about.",
+          "createdAt": "2026-08-18T22:37:31Z",
+          "updatedAt": "2026-08-18T22:37:31Z"
+        },
+        {
+          "author": "martinthomson",
+          "authorAssociation": "NONE",
+          "body": "I don't know if this belongs here or on #11, but the way that the document handles unwanted 0-RTT will determine what a client can attempt with 0-RTT.  If the client chooses to send pure 0-RTT packets *first*, that creates a state commitment on the server that is hard to justify.  How we manage that is going to be very tricky to think about.\n\nOne idea here is to include a minimal-sized Initial in the larger probe packets, so that the server has the opportunity to retrieve its address validation token (assuming that one is present).  That might help it decide that keeping those packets is worthwhile.  Without that, a chunk of largish 0-RTT packets without preamble are going to look like very tempting things to just drop.",
+          "createdAt": "2026-08-18T22:40:17Z",
+          "updatedAt": "2026-08-18T22:40:17Z"
+        }
+      ]
+    },
+    {
+      "number": 11,
+      "id": "I_kwDOTeG0yc8AAAABNSrA3w",
+      "title": "0-RTT treatment",
+      "url": "https://github.com/marten-seemann/draft-seemann-quic-ppdplpmtud/issues/11",
+      "state": "OPEN",
+      "author": "martinthomson",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "> 0-RTT data and probes share the initial congestion window. A few small requests can leave room for probing, but more 0-RTT data makes probing less useful\n\nI don't think that this is quite right.\n\nIn the extreme, the server will only receive the minimum-sized datagram/packet, which means that there isn't much choice about what to include in those.  Those have to include handshake CRYPTO frames, with any leftover available for fresh 0-RTT data.\n\nA client has a four-way choice about what it includes in the probes that precede it:\n\n1. Send padding and waste an opportunity.\n2. Send redundant copies of the CRYPTO frames, which will accelerate the handshake if these packets arrive first or the minimum-sized packets are lost.  \n3. Send redundant copies of 0-RTT data.\n\nHowever, even if it decides to send the maximum amount of redundant data, there will be extra space in these packets.  There is no point in being doubly redundant unless the packet size increase allows a two-packet handshake to fit in one packet, which is unlikely.\n\nSo the client has to decide whether it will waste that opportunity or send fresh 0-RTT data in the extra space.  My position is that it can and should send whatever STREAM data it can.  The question is whether you stop sending redundant copies of the CRYPTO data in the larger packets.  I tend to think that this is a fine thing to do, provided that the server is willing to accept that much 0-RTT.\n\nIn short, the treatment of 0-RTT probably needs to be reworked in light of an analysis like this.",
+      "createdAt": "2026-08-18T22:35:47Z",
+      "updatedAt": "2026-08-18T22:35:47Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 12,
+      "id": "I_kwDOTeG0yc8AAAABNStqHw",
+      "title": "Metered networks",
+      "url": "https://github.com/marten-seemann/draft-seemann-quic-ppdplpmtud/issues/12",
+      "state": "OPEN",
+      "author": "martinthomson",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "This is not worth a \"SHOULD\":\n\n> SHOULD disable probing on metered networks\n\nThis is a policy decision.  A reminder that these packets could be waste and therefore might be inadvisable when data is metered or otherwise costly (such as on a device with limited battery) is good to remind people of, but don't treat it as a normative thing.",
+      "createdAt": "2026-08-18T22:41:54Z",
+      "updatedAt": "2026-08-18T22:41:54Z",
       "closedAt": null,
       "comments": []
     }
