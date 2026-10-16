@@ -5,8 +5,8 @@
 QUIC                                                          M. Seemann
 Internet-Draft                                                          
 Intended status: Informational                                 L. Eggert
-Expires: 17 February 2027                                        Mozilla
-                                                          16 August 2026
+Expires: 19 April 2027                                           Mozilla
+                                                         16 October 2026
 
 
                    Parallel Probing DPLPMTUD for QUIC
@@ -56,7 +56,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 17 February 2027.
+   This Internet-Draft will expire on 19 April 2027.
 
 Copyright Notice
 
@@ -438,9 +438,9 @@ Table of Contents
    [I-D.ietf-masque-connect-ethernet]
               Sedeño, A., "Proxying Ethernet Frames in HTTP", Work in
               Progress, Internet-Draft, draft-ietf-masque-connect-
-              ethernet-12, 12 August 2026,
+              ethernet-16, 9 October 2026,
               <https://datatracker.ietf.org/doc/html/draft-ietf-masque-
-              connect-ethernet-12>.
+              connect-ethernet-16>.
 
    [I-D.ietf-webtrans-http3]
               Frindell, A., Kinnear, E., and V. Vasiliev, "WebTransport
