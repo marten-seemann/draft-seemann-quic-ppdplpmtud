@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-08-20T00:10:14.324692+00:00",
+  "timestamp": "2026-10-18T02:37:27.330421+00:00",
   "repo": "marten-seemann/draft-seemann-quic-ppdplpmtud",
   "labels": [
     {
@@ -102,9 +102,17 @@
       "labels": [],
       "body": "Instead, suggest that the probes can carry redundant copies of data, which improves the chances that the handshake data is available.\n\nIt looks like the neqo implementation sends CRYPTO data in every packet it sends, which is good.",
       "createdAt": "2026-08-18T22:21:49Z",
-      "updatedAt": "2026-08-18T22:21:49Z",
+      "updatedAt": "2026-10-16T11:59:24Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "larseggert",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I think the current text already says that.\nhttps://github.com/marten-seemann/draft-seemann-quic-ppdplpmtud/blob/82a77b9cbb06a2d7619e9fb89e1428a3d09825a1/draft-seemann-quic-ppdplpmtud.md?plain=1#L195-L196",
+          "createdAt": "2026-10-16T11:59:24Z",
+          "updatedAt": "2026-10-16T11:59:24Z"
+        }
+      ]
     },
     {
       "number": 10,
@@ -520,6 +528,32 @@
           "comments": []
         }
       ]
+    },
+    {
+      "number": 13,
+      "id": "PR_kwDOTeG0yc8AAAABI1-fmA",
+      "title": "Update CODEOWNERS",
+      "url": "https://github.com/marten-seemann/draft-seemann-quic-ppdplpmtud/pull/13",
+      "state": "OPEN",
+      "author": "larseggert",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Add lars@eggert.org as code owner.\r\n\r\n(This comes from `make update-files`.)",
+      "createdAt": "2026-10-16T12:35:01Z",
+      "updatedAt": "2026-10-16T12:35:29Z",
+      "baseRepository": "marten-seemann/draft-seemann-quic-ppdplpmtud",
+      "baseRefName": "main",
+      "baseRefOid": "82a77b9cbb06a2d7619e9fb89e1428a3d09825a1",
+      "headRepository": "marten-seemann/draft-seemann-quic-ppdplpmtud",
+      "headRefName": "update-files",
+      "headRefOid": "2424db3820ea1e3917f92f0fc5eb626d793a70ec",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
     }
   ]
 }
